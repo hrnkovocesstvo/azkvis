@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Přenos dat mezi zařízeními bez serveru</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="./Scripts/komunikace.js" defer></script>
+    <script src="./Scripts/azKviz.js" defer></script>
+    <script src="./Scripts/spectator.js" defer></script>
+</head>
+
+<body>
+    <div id="webrtc-section">
+        <h2>📡 WebRTC přenos dat (bez serveru)</h2>
+
+        <p><b>Krok 1:</b> Na <u>PC1</u> klikni „Vytvoř spojení“ a zkopíruj Offer do <u>PC2</u>.</p>
+        <p><b>Krok 2:</b> Na <u>PC2</u> vlož Offer, klikni „Odpovědět“ a zkopíruj Answer zpět do <u>PC1</u>.</p>
+        <hr>
+
+        <textarea id="offer" placeholder="Offer / Answer JSON"></textarea><br>
+        <button id="create">Vytvoř spojení (Offer)</button>
+        <button id="answer">Odpovědět (Answer)</button>
+        <button id="connect">Připojit</button>
+
+        <hr>
+
+        <textarea id="log" readonly placeholder="Log..."></textarea><br>
+
+        <input id="msg" placeholder="Zadej zprávu...">
+        <button id="send">Odeslat</button>
+    </div>
+
+    <div id="Odpoved2"></div>
+
+    <div class="container" id="container">
+        <!-- Řada 1: 1 tlačítko -->
+        <div class="row">
+            <div class="hex-button" id="btn-1">
+                <div class="hexagon">1</div>
+            </div>
+        </div>
+
+        <!-- Řada 2: 2 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-2">
+                <div class="hexagon">2</div>
+            </div>
+            <div class="hex-button" id="btn-3">
+                <div class="hexagon">3</div>
+            </div>
+        </div>
+
+        <!-- Řada 3: 3 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-4">
+                <div class="hexagon">4</div>
+            </div>
+            <div class="hex-button" id="btn-5">
+                <div class="hexagon">5</div>
+            </div>
+            <div class="hex-button" id="btn-6">
+                <div class="hexagon">6</div>
+            </div>
+        </div>
+
+        <!-- Řada 4: 4 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-7">
+                <div class="hexagon">7</div>
+            </div>
+            <div class="hex-button" id="btn-8">
+                <div class="hexagon">8</div>
+            </div>
+            <div class="hex-button" id="btn-9">
+                <div class="hexagon">9</div>
+            </div>
+            <div class="hex-button" id="btn-10">
+                <div class="hexagon">10</div>
+            </div>
+        </div>
+
+        <!-- Řada 5: 5 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-11">
+                <div class="hexagon">11</div>
+            </div>
+            <div class="hex-button" id="btn-12">
+                <div class="hexagon">12</div>
+            </div>
+            <div class="hex-button" id="btn-13">
+                <div class="hexagon">13</div>
+            </div>
+            <div class="hex-button" id="btn-14">
+                <div class="hexagon">14</div>
+            </div>
+            <div class="hex-button" id="btn-15">
+                <div class="hexagon">15</div>
+            </div>
+        </div>
+
+        <!-- Řada 6: 6 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-16">
+                <div class="hexagon">16</div>
+            </div>
+            <div class="hex-button" id="btn-17">
+                <div class="hexagon">17</div>
+            </div>
+            <div class="hex-button" id="btn-18">
+                <div class="hexagon">18</div>
+            </div>
+            <div class="hex-button" id="btn-19">
+                <div class="hexagon">19</div>
+            </div>
+            <div class="hex-button" id="btn-20">
+                <div class="hexagon">20</div>
+            </div>
+            <div class="hex-button" id="btn-21">
+                <div class="hexagon">21</div>
+            </div>
+        </div>
+
+        <!-- Řada 7: 7 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-22">
+                <div class="hexagon">22</div>
+            </div>
+            <div class="hex-button" id="btn-23">
+                <div class="hexagon">23</div>
+            </div>
+            <div class="hex-button" id="btn-24">
+                <div class="hexagon">24</div>
+            </div>
+            <div class="hex-button" id="btn-25">
+                <div class="hexagon">25</div>
+            </div>
+            <div class="hex-button" id="btn-26">
+                <div class="hexagon">26</div>
+            </div>
+            <div class="hex-button" id="btn-27">
+                <div class="hexagon">27</div>
+            </div>
+            <div class="hex-button" id="btn-28">
+                <div class="hexagon">28</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // spectator helper: load questions from localStorage and render a simple readable view.
+        // This uses the same storage key as the host (AzKviz.Otazky) and listens for updates
+        // via storage event and BroadcastChannel('azkviz').
+
+        function LoadOtazkyFromStorage() {
+            try {
+                const raw = localStorage.getItem('AzKviz.Otazky');
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (err) {
+                console.error('LoadOtazkyFromStorage error', err);
+                return null;
+            }
+        }
+
+        function formatQuestion(q) {
+            if (!q) return '';
+            // common field guesses, fallback to full JSON
+            return q.otazka || q.question || q.text || q.title || (q.q || JSON.stringify(q));
+        }
+
+        function renderOtazky() {
+            const el = document.getElementById('Odpoved2');
+            if (!el) return;
+            const otazky = window.Otazky || LoadOtazkyFromStorage();
+            if (!Array.isArray(otazky) || otazky.length === 0) {
+                el.innerHTML = '<em>Žádné otázky. Očekává se, že host spustí výběr otázek (StartOtazky) nebo že se načte database.json.</em>';
+                return;
+            }
+            // render compact list
+            const parts = otazky.map((q, i) => {
+                const text = formatQuestion(q);
+                const id = q && (q.id !== undefined ? q.id : '');
+                return `<div class="spec-q" data-index="${i}" title="id:${id}"><strong>${i+1}.</strong> ${escapeHtml(text)}</div>`;
+            });
+            el.innerHTML = parts.join('');
+        }
+
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        window.addEventListener('storage', (ev) => {
+            if (ev.key === 'AzKviz.Otazky' && ev.newValue) {
+                try {
+                    window.Otazky = JSON.parse(ev.newValue);
+                } catch (e) {
+                    window.Otazky = null;
+                }
+                renderOtazky();
+            }
+        });
+
+        try {
+            if (!window.__AzKvizBC) window.__AzKvizBC = new BroadcastChannel('azkviz');
+            window.__AzKvizBC.onmessage = (m) => {
+                if (m && m.data && m.data.type === 'otazky-updated') {
+                    const loaded = LoadOtazkyFromStorage();
+                    if (loaded) {
+                        window.Otazky = loaded;
+                        renderOtazky();
+                    }
+                }
+            };
+        } catch (e) { /* BroadcastChannel nepodporován */ }
+
+        // On load: try to use existing storage, otherwise attempt to fetch local database.json
+        window.addEventListener('DOMContentLoaded', async () => {
+            const existing = LoadOtazkyFromStorage();
+            if (existing && Array.isArray(existing) && existing.length) {
+                window.Otazky = existing;
+                renderOtazky();
+                return;
+            }
+            // if no stored questions, try to fetch relative database.json (useful when opening spectator stand-alone)
+            try {
+                const resp = await fetch('database.json', { cache: 'no-store' });
+                if (resp.ok) {
+                    const json = await resp.json();
+                    const list = Array.isArray(json) ? json : (json && Array.isArray(json.otazky) ? json.otazky : null);
+                    if (list && list.length) {
+                        // keep it local to this page; don't overwrite storage of host automatically
+                        window.Otazky = list.slice(0, 28);
+                        renderOtazky();
+                        return;
+                    }
+                }
+            } catch (e) {
+                // ignore fetch errors
+            }
+            renderOtazky();
+        });
+    </script>
+</body>
+
+</html>

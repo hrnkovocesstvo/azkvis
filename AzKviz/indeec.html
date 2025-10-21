@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Přenos dat mezi zařízeními bez serveru</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="./Scripts/komunikace.js" defer></script>
+    <script src="./Scripts/azKviz.js" defer></script>
+    <script src="./Scripts/index.js" defer></script>
+</head>
+
+<body>
+    <div id="webrtc-section">
+        <h2>📡 WebRTC přenos dat (bez serveru)</h2>
+
+        <p>
+            <b>Krok 1:</b> Na <u>PC1</u> klikni „Vytvoř spojení“ a zkopíruj Offer do
+            <u>PC2</u>.
+        </p>
+        <p>
+            <b>Krok 2:</b> Na <u>PC2</u> vlož Offer, klikni „Odpovědět“ a zkopíruj
+            Answer zpět do <u>PC1</u>.
+        </p>
+        <hr />
+
+        <textarea id="offer" placeholder="Offer / Answer JSON"></textarea><br />
+        <button id="create">Vytvoř spojení (Offer)</button>
+        <button id="answer">Odpovědět (Answer)</button>
+        <button id="connect">Připojit</button>
+
+        <hr />
+
+        <textarea id="log" readonly placeholder="Log..."></textarea><br />
+
+        <input id="msg" placeholder="Zadej zprávu..." />
+        <button id="send">Odeslat</button>
+    </div>
+
+    <script>
+        async function StartOtazky(source, options = {}) {
+            options = options || {};
+            const excludeIds = new Set(options.excludeIds || []);
+            const excludePredicate =
+                typeof options.excludePredicate === "function"
+                    ? options.excludePredicate
+                    : null;
+            const noRepeatGlobal = !!options.noRepeatGlobal;
+
+            // globální tracking již vybraných otázek napříč voláními (pokud potřebujete)
+            if (!window.__UsedOtazky) window.__UsedOtazky = new Set();
+
+            let all = null;
+            if (typeof source === "string") {
+                try {
+                    const resp = await fetch(source, { cache: "no-store" });
+                    if (!resp.ok)
+                        throw new Error("Chyba při stahování: " + resp.status);
+                    const json = await resp.json();
+                    if (Array.isArray(json)) {
+                        all = json.slice();
+                    } else if (json && Array.isArray(json.otazky)) {
+                        all = json.otazky.slice();
+                    } else {
+                        throw new Error("Načtený JSON neobsahuje pole otázek.");
+                    }
+                } catch (err) {
+                    console.error(
+                        "StartOtazky: nepodařilo se načíst otázky ze souboru",
+                        err
+                    );
+                    throw err;
+                }
+            } else if (Array.isArray(source)) {
+                all = source.slice();
+            } else if (Array.isArray(window.ALL_OTAZKY)) {
+                all = window.ALL_OTAZKY.slice();
+            } else {
+                throw new Error(
+                    "StartOtazky: nebyl předán zdroj otázek (string | Array) a window.ALL_OTAZKY neexistuje."
+                );
+            }
+
+            // filtrace podle excludeIds / predicate / globálně použitých
+            const filtered = all.filter((q) => {
+                if (!q) return false;
+                if (q.id !== undefined && excludeIds.has(Number(q.id))) return false;
+                if (excludePredicate && excludePredicate(q)) return false;
+                if (
+                    noRepeatGlobal &&
+                    q.id !== undefined &&
+                    window.__UsedOtazky.has(String(q.id))
+                )
+                    return false;
+                return true;
+            });
+
+            // deduplikace podle id nebo serializace
+            const map = new Map();
+            for (const q of filtered) {
+                const key =
+                    q && q.id !== undefined && q.id !== null
+                        ? String(q.id)
+                        : JSON.stringify(q);
+                if (!map.has(key)) map.set(key, q);
+            }
+            const unique = Array.from(map.values());
+
+            // promíchat (Fisher–Yates)
+            for (let i = unique.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [unique[i], unique[j]] = [unique[j], unique[i]];
+            }
+
+            const count = Math.min(28, unique.length);
+            const vybrane = unique.slice(0, count);
+
+            // pokud používáme globální no-repeat, označíme vybrané id jako použité
+            if (noRepeatGlobal) {
+                for (const q of vybrane) {
+                    if (q && q.id !== undefined && q.id !== null)
+                        window.__UsedOtazky.add(String(q.id));
+                }
+            }
+
+            // uložit tam, kde to uvidí všechny stránky/záložky -> localStorage
+            const STORAGE_KEY = 'AzKviz.Otazky';
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(vybrane));
+                // také udržíme krátký timestamp (možné využití)
+                localStorage.setItem(STORAGE_KEY + '.ts', String(Date.now()));
+            } catch (err) {
+                console.error('Nelze uložit do localStorage:', err);
+            }
+            // pro kompatibilitu v této kartě necháme window.Otazky také nastavené
+            window.Otazky = vybrane;
+
+            // notifikace ostatním záložkám (BroadcastChannel pokud dostupný)
+            try {
+                if (!window.__AzKvizBC) window.__AzKvizBC = new BroadcastChannel('azkviz');
+                window.__AzKvizBC.postMessage({ type: 'otazky-updated', ts: Date.now() });
+            } catch (err) {
+                // BroadcastChannel není podporován -> storage event se i tak vyvolá při setItem v jiných záložkách
+            }
+
+            console.info(
+                `StartOtazky: původně ${all.length} otázek, po filtraci ${unique.length}, vybráno ${vybrane.length}.`
+            );
+            return vybrane;
+        }
+        // export funkce a automatické načtení na DOMContentLoaded
+        window.StartOtazky = StartOtazky;
+
+        // helper: načítání z localStorage (vícero stránek může použít)
+        window.LoadOtazkyFromStorage = function () {
+            try {
+                const raw = localStorage.getItem('AzKviz.Otazky');
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (err) {
+                console.error('LoadOtazkyFromStorage error', err);
+                return null;
+            }
+        };
+
+        // reagovat na změny z jiných záložek
+        window.addEventListener('storage', (ev) => {
+            if (ev.key === 'AzKviz.Otazky' && ev.newValue) {
+                try {
+                    window.Otazky = JSON.parse(ev.newValue);
+                    console.info('window.Otazky aktualizováno ze storage eventu');
+                } catch (e) { /* ignore */ }
+            }
+        });
+        try {
+            if (!window.__AzKvizBC) window.__AzKvizBC = new BroadcastChannel('azkviz');
+            window.__AzKvizBC.onmessage = (m) => {
+                if (m && m.data && m.data.type === 'otazky-updated') {
+                    const loaded = window.LoadOtazkyFromStorage();
+                    if (loaded) {
+                        window.Otazky = loaded;
+                        console.info('window.Otazky aktualizováno přes BroadcastChannel');
+                    }
+                }
+            };
+        } catch (e) { /* BroadcastChannel nepodporován */ }
+
+        // automatické spuštění po načtení DOM (volitelné)
+        window.addEventListener('DOMContentLoaded', () => {
+            // pokud už někdo uložil Otazky do localStorage, načteme je
+            const existing = window.LoadOtazkyFromStorage();
+            if (existing && Array.isArray(existing) && existing.length) {
+                window.Otazky = existing;
+                console.info('Načteno window.Otazky z localStorage při startu');
+                return;
+            }
+            // jinak spustíme import z /database.json (opravená cesta na relativní soubor)
+            StartOtazky('database.json').catch(err => console.error(err));
+        });
+    </script>
+    
+    <div class="container" id="container">
+        <!-- Řada 1: 1 tlačítko -->
+        <div class="row">
+            <div class="hex-button" id="btn-1">
+                <div class="hexagon">1</div>
+            </div>
+        </div>
+
+        <!-- Řada 2: 2 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-2">
+                <div class="hexagon">2</div>
+            </div>
+            <div class="hex-button" id="btn-3">
+                <div class="hexagon">3</div>
+            </div>
+        </div>
+
+        <!-- Řada 3: 3 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-4">
+                <div class="hexagon">4</div>
+            </div>
+            <div class="hex-button" id="btn-5">
+                <div class="hexagon">5</div>
+            </div>
+            <div class="hex-button" id="btn-6">
+                <div class="hexagon">6</div>
+            </div>
+        </div>
+
+        <!-- Řada 4: 4 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-7">
+                <div class="hexagon">7</div>
+            </div>
+            <div class="hex-button" id="btn-8">
+                <div class="hexagon">8</div>
+            </div>
+            <div class="hex-button" id="btn-9">
+                <div class="hexagon">9</div>
+            </div>
+            <div class="hex-button" id="btn-10">
+                <div class="hexagon">10</div>
+            </div>
+        </div>
+
+        <!-- Řada 5: 5 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-11">
+                <div class="hexagon">11</div>
+            </div>
+            <div class="hex-button" id="btn-12">
+                <div class="hexagon">12</div>
+            </div>
+            <div class="hex-button" id="btn-13">
+                <div class="hexagon">13</div>
+            </div>
+            <div class="hex-button" id="btn-14">
+                <div class="hexagon">14</div>
+            </div>
+            <div class="hex-button" id="btn-15">
+                <div class="hexagon">15</div>
+            </div>
+        </div>
+
+        <!-- Řada 6: 6 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-16">
+                <div class="hexagon">16</div>
+            </div>
+            <div class="hex-button" id="btn-17">
+                <div class="hexagon">17</div>
+            </div>
+            <div class="hex-button" id="btn-18">
+                <div class="hexagon">18</div>
+            </div>
+            <div class="hex-button" id="btn-19">
+                <div class="hexagon">19</div>
+            </div>
+            <div class="hex-button" id="btn-20">
+                <div class="hexagon">20</div>
+            </div>
+            <div class="hex-button" id="btn-21">
+                <div class="hexagon">21</div>
+            </div>
+        </div>
+
+        <!-- Řada 7: 7 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-22">
+                <div class="hexagon">22</div>
+            </div>
+            <div class="hex-button" id="btn-23">
+                <div class="hexagon">23</div>
+            </div>
+            <div class="hex-button" id="btn-24">
+                <div class="hexagon">24</div>
+            </div>
+            <div class="hex-button" id="btn-25">
+                <div class="hexagon">25</div>
+            </div>
+            <div class="hex-button" id="btn-26">
+                <div class="hexagon">26</div>
+            </div>
+            <div class="hex-button" id="btn-27">
+                <div class="hexagon">27</div>
+            </div>
+            <div class="hex-button" id="btn-28">
+                <div class="hexagon">28</div>
+            </div>
+        </div>
+    </div>
+    <div id="Otazka"></div>
+    <div id="Odpoved"></div>
+    <div id="Buttons">
+        <button id="OrangeB">Orange</button>
+        <button id="BlackB">Black</button>
+        <button id="BlueB">Blue</button>
+    </div>
+</body>
+
+</html>

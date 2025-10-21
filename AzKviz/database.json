@@ -1,0 +1,154 @@
+{
+    "otazky": [
+        {
+            "id": 1,
+            "otazka": "Jaké je hlavní město České republiky?",
+            "odpoved": "Praha"
+        },
+        {
+            "id": 2,
+            "otazka": "Která řeka protéká Prahou?",
+            "odpoved": "Vltava"
+        },
+        {
+            "id": 3,
+            "otazka": "Kolik kontinentů existuje na Zemi?",
+            "odpoved": "7"
+        },
+        {
+            "id": 4,
+            "otazka": "Která hora je nejvyšší horou Evropy?",
+            "odpoved": "Elbrus"
+        },
+        {
+            "id": 5,
+            "otazka": "Ve kterém oceánu leží Havajské ostrovy?",
+            "odpoved": "Tichý oceán"
+        },
+        {
+            "id": 6,
+            "otazka": "V kterém roce skončila druhá světová válka?",
+            "odpoved": "1945"
+        },
+        {
+            "id": 7,
+            "otazka": "Kdo byl prvním prezidentem Československa?",
+            "odpoved": "Tomáš Garrigue Masaryk"
+        },
+        {
+            "id": 8,
+            "otazka": "Ve kterém roce došlo k pádu Berlínské zdi?",
+            "odpoved": "1989"
+        },
+        {
+            "id": 9,
+            "otazka": "Kdo objevil Ameriku?",
+            "odpoved": "Kryštof Kolumbus"
+        },
+        {
+            "id": 10,
+            "otazka": "Ve kterém roce byla založena OSN?",
+            "odpoved": "1945"
+        },
+        {
+            "id": 11,
+            "otazka": "Jaký je chemický symbol pro zlato?",
+            "odpoved": "Au"
+        },
+        {
+            "id": 12,
+            "otazka": "Kolik planet je ve sluneční soustavě?",
+            "odpoved": "8"
+        },
+        {
+            "id": 13,
+            "otazka": "Která planeta je nejblíže Slunci?",
+            "odpoved": "Merkur"
+        },
+        {
+            "id": 14,
+            "otazka": "Co je nejrychlejší zvíře na světě?",
+            "odpoved": "Sokol stěhovavý"
+        },
+        {
+            "id": 15,
+            "otazka": "Kolik srdcí má chobotnice?",
+            "odpoved": "3"
+        },
+        {
+            "id": 16,
+            "otazka": "Kolik hráčů má fotbalové mužstvo na hřišti?",
+            "odpoved": "11"
+        },
+        {
+            "id": 17,
+            "otazka": "Kde se konaly letní olympijské hry v roce 2020?",
+            "odpoved": "Tokio"
+        },
+        {
+            "id": 18,
+            "otazka": "Který sport hraje Roger Federer?",
+            "odpoved": "Tenis"
+        },
+        {
+            "id": 19,
+            "otazka": "Kolik bodů má trojka v basketbalu?",
+            "odpoved": "3"
+        },
+        {
+            "id": 20,
+            "otazka": "Který klub vyhrál Ligu mistrů v roce 2023?",
+            "odpoved": "Manchester City"
+        },
+        {
+            "id": 21,
+            "otazka": "Kdo namaloval obraz Mona Lisa?",
+            "odpoved": "Leonardo da Vinci"
+        },
+        {
+            "id": 22,
+            "otazka": "Kdo napsal dílo Babička?",
+            "odpoved": "Božena Němcová"
+        },
+        {
+            "id": 23,
+            "otazka": "Který hudební nástroj má 88 kláves?",
+            "odpoved": "Klavír"
+        },
+        {
+            "id": 24,
+            "otazka": "Kde se nachází slavná opera La Scala?",
+            "odpoved": "Milán"
+        },
+        {
+            "id": 25,
+            "otazka": "Kdo složil Čtvero ročních období?",
+            "odpoved": "Antonio Vivaldi"
+        },
+        {
+            "id": 26,
+            "otazka": "Co znamená HTML?",
+            "odpoved": "HyperText Markup Language"
+        },
+        {
+            "id": 27,
+            "otazka": "Kdo založil společnost Microsoft?",
+            "odpoved": "Bill Gates"
+        },
+        {
+            "id": 28,
+            "otazka": "V jakém roce byl uveden první iPhone?",
+            "odpoved": "2007"
+        },
+        {
+            "id": 29,
+            "otazka": "Co znamená zkratka AI v technologiích?",
+            "odpoved": "Artificial Intelligence"
+        },
+        {
+            "id": 30,
+            "otazka": "Kolik bitů je v jednom bajtu?",
+            "odpoved": "8"
+        }
+    ]
+}

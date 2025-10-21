@@ -1,0 +1,138 @@
+body {
+            font-family: sans-serif;
+            margin: 20px;
+            background: #111;
+            color: #eee;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #222;
+            color: #0f0;
+            border: 1px solid #333;
+        }
+
+        button {
+            margin: 5px 0;
+            padding: 6px 12px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;   /* DŮLEŽITÉ! */
+            justify-content: flex-start;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .hex-button {
+            width: 80px;
+            height: 92px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hex-button:hover {
+            transform: scale(1.1);
+        }
+
+        .hex-button:active {
+            transform: scale(0.95);
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .hex-button:hover .hexagon {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .hex-button.clicked .hexagon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+.hidden{
+    display: none;
+}
+
+#Otazka, #Odpoved,#Odpoved2 {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto 0 auto;
+    padding: 18px 24px;
+    background: rgba(255,255,255,0.10);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    font-size: 1.25rem;
+    text-align: center;
+    color: #fff;
+    letter-spacing: 0.02em;
+    transition: background 0.3s;
+}
+
+#Otazka {
+    font-weight: bold;
+    margin-top: 40px;
+    background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+}
+
+#Odpoved,#Odpoved2  {
+    font-weight: normal;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    color: #222;
+}
+
+.orange{
+    background: orange !important;
+}
+
+.blue{
+    background: blue !important;
+}
+
+.black{
+    background: black !important;
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagonální tlačítka</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .hex-button {
+            width: 80px;
+            height: 92px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hex-button:hover {
+            transform: scale(1.1);
+        }
+
+        .hex-button:active {
+            transform: scale(0.95);
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .hex-button:hover .hexagon {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .hex-button.clicked .hexagon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        /* Různé barvy pro každou řadu */
+        .row:nth-child(1) .hexagon {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .row:nth-child(2) .hexagon {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .row:nth-child(3) .hexagon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .row:nth-child(4) .hexagon {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .row:nth-child(5) .hexagon {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .row:nth-child(6) .hexagon {
+            background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%);
+        }
+
+        .row:nth-child(7) .hexagon {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Řada 1: 1 tlačítko -->
+        <div class="row">
+            <div class="hex-button" id="btn-1">
+                <div class="hexagon">1</div>
+            </div>
+        </div>
+
+        <!-- Řada 2: 2 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-2">
+                <div class="hexagon">2</div>
+            </div>
+            <div class="hex-button" id="btn-3">
+                <div class="hexagon">3</div>
+            </div>
+        </div>
+
+        <!-- Řada 3: 3 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-4">
+                <div class="hexagon">4</div>
+            </div>
+            <div class="hex-button" id="btn-5">
+                <div class="hexagon">5</div>
+            </div>
+            <div class="hex-button" id="btn-6">
+                <div class="hexagon">6</div>
+            </div>
+        </div>
+
+        <!-- Řada 4: 4 tlačítka -->
+        <div class="row">
+            <div class="hex-button" id="btn-7">
+                <div class="hexagon">7</div>
+            </div>
+            <div class="hex-button" id="btn-8">
+                <div class="hexagon">8</div>
+            </div>
+            <div class="hex-button" id="btn-9">
+                <div class="hexagon">9</div>
+            </div>
+            <div class="hex-button" id="btn-10">
+                <div class="hexagon">10</div>
+            </div>
+        </div>
+
+        <!-- Řada 5: 5 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-11">
+                <div class="hexagon">11</div>
+            </div>
+            <div class="hex-button" id="btn-12">
+                <div class="hexagon">12</div>
+            </div>
+            <div class="hex-button" id="btn-13">
+                <div class="hexagon">13</div>
+            </div>
+            <div class="hex-button" id="btn-14">
+                <div class="hexagon">14</div>
+            </div>
+            <div class="hex-button" id="btn-15">
+                <div class="hexagon">15</div>
+            </div>
+        </div>
+
+        <!-- Řada 6: 6 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-16">
+                <div class="hexagon">16</div>
+            </div>
+            <div class="hex-button" id="btn-17">
+                <div class="hexagon">17</div>
+            </div>
+            <div class="hex-button" id="btn-18">
+                <div class="hexagon">18</div>
+            </div>
+            <div class="hex-button" id="btn-19">
+                <div class="hexagon">19</div>
+            </div>
+            <div class="hex-button" id="btn-20">
+                <div class="hexagon">20</div>
+            </div>
+            <div class="hex-button" id="btn-21">
+                <div class="hexagon">21</div>
+            </div>
+        </div>
+
+        <!-- Řada 7: 7 tlačítek -->
+        <div class="row">
+            <div class="hex-button" id="btn-22">
+                <div class="hexagon">22</div>
+            </div>
+            <div class="hex-button" id="btn-23">
+                <div class="hexagon">23</div>
+            </div>
+            <div class="hex-button" id="btn-24">
+                <div class="hexagon">24</div>
+            </div>
+            <div class="hex-button" id="btn-25">
+                <div class="hexagon">25</div>
+            </div>
+            <div class="hex-button" id="btn-26">
+                <div class="hexagon">26</div>
+            </div>
+            <div class="hex-button" id="btn-27">
+                <div class="hexagon">27</div>
+            </div>
+            <div class="hex-button" id="btn-28">
+                <div class="hexagon">28</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Přidání funkcionality pro klikání
+        document.querySelectorAll('.hex-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('clicked');
+                console.log('Kliknuto na: ' + this.id);
+            });
+        });
+    </script>
+</body>
+</html>

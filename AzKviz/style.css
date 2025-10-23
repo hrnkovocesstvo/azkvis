@@ -126,13 +126,14 @@ body {
 }
 
 .orange{
-    background: orange !important;
+    background: orange;
 }
 
 .blue{
-    background: blue !important;
+    background: blue;
 }
 
 .black{
-    background: black !important;
+    background: black;
+
 }

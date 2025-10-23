@@ -125,15 +125,14 @@ body {
     color: #222;
 }
 
+.black{
+    background: black;
+}
+
 .orange{
     background: orange;
 }
 
 .blue{
     background: blue;
-}
-
-.black{
-    background: black;
-
 }
